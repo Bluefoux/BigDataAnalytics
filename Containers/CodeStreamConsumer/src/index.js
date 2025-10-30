@@ -14,6 +14,11 @@ const FileStorage = require('./FileStorage');
 // --------------------
 const form = formidable({multiples:false});
 
+const stats = {
+    count: 0n,
+    sums: { total: 0n, match: 0n },
+};
+
 app.post('/', fileReceiver );
 function fileReceiver(req, res, next) {
     form.parse(req, (err, fields, files) => {
@@ -24,6 +29,13 @@ function fileReceiver(req, res, next) {
 }
 
 app.get('/', viewClones );
+
+app.get('/mydata', viewMoreData );
+
+app.get('/progress.json', (req, res) => {
+    const fileStore = FileStorage.getInstance();
+    res.json({ processed: fileStore.numberOfFiles });
+});
 
 const server = app.listen(PORT, () => { console.log('Listening for files on port', PORT); });
 
@@ -91,6 +103,29 @@ function viewClones(req, res, next) {
     res.send(page);
 }
 
+function viewMoreData(req, res, next) {
+    const count = stats.count;
+    const avgTotal = averageTimes(stats.sums.total, count);
+    const avgMatch = averageTimes(stats.sums.match, count);
+
+    let page  = '<HTML><HEAD><TITLE>CodeStream Clone Detector Data</TITLE></HEAD>\n';
+    page += '<BODY><H1>CodeStream Clone Detector</H1>\n';
+    page += '<P>' + getStatistics() + '</P>\n';
+
+    page += '<h2>Average Times</h2>\n';
+    if (count === 0n) {
+        page += '<p>No files processed yet.</p>\n';
+    } else {
+        page += '<ul>\n';
+        page += `<li>Files counted: ${count.toString()}</li>\n`;
+        page += `<li>Average total: ${nsToMicro(avgTotal)} µs (~${nsToMilli(avgTotal).toFixed(3)} ms)</li>\n`;
+        page += `<li>Average match: ${nsToMicro(avgMatch)} µs (~${nsToMilli(avgMatch).toFixed(3)} ms)</li>\n`;
+        page += '</ul>\n';
+    }
+    page += '</BODY></HTML>';
+    res.send(page);
+}
+
 // Some helper functions
 // --------------------
 // PASS is used to insert functions in a Promise stream and pass on all input parameters untouched.
@@ -102,6 +137,22 @@ PASS = fn => d => {
         throw e;
     }
 };
+
+function updateStats(file) {
+    const timers = Timer.getTimers(file) || {};
+    const total = timers.total || 0n;
+    const match = timers.match || 0n;
+    stats.count += 1n;
+    stats.sums.total += total;
+    stats.sums.match += match;
+}
+
+function averageTimes(sum, count) {
+    return count === 0n ? 0n : (sum / count);
+}
+function nsToMicro(ns) { return ns / 1000n; }
+function nsToMilli(ns) { return Number(ns) / 1e6; }
+
 
 const STATS_FREQ = 100;
 const URL = process.env.URL || 'http://localhost:8080/';
@@ -141,6 +192,7 @@ function processFile(filename, contents) {
 
         .then( (file) => cd.storeFile(file) )
         .then( (file) => Timer.endTimer(file, 'total') )
+        .then( (file) => { updateStats(file); return file; } )
         .then( PASS( (file) => lastFile = file ))
         .then( PASS( (file) => maybePrintStatistics(file, cd, cloneStore) ))
     // TODO Store the timers from every file (or every 10th file), create a new landing page /timers

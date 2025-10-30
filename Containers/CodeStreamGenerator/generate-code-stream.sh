@@ -8,7 +8,7 @@ createFileList() {
 sendFile() {
   # echo "Sending file" "$1" to "$TARGET"
   curl -s -F "name=$1" -F "data=@$1" "$TARGET"
-  sleep 0.01  # A slight delay is necessary here to not overrun buffers in the consumer
+  sleep 0.1  # A slight delay is necessary here to not overrun buffers in the consumer
 }
 
 

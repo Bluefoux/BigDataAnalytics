@@ -1,9 +1,13 @@
 # Docker Compose for All-At-Once Code Clone Detection
 
-version: "3.8"
 services:
   clone-detector:
+    # image: cljdetector
+    build:
+      context: ./Containers/cljdetector
     image: cljdetector
+    depends_on:
+      - dbstorage
     command: clear 
     ports:
       - 8080:3000
@@ -28,6 +32,36 @@ services:
     volumes:
       - dbstorage:/data/db
       - dbconfig:/data/configdb
+
+  monitorweb:
+    build:
+      context: ./Containers/MonitorWeb
+    image: monitorweb
+    depends_on:
+      - dbstorage
+    environment:
+      DBHOST: dbstorage
+      DBPORT: "27017"
+      DBNAME: "cloneDetector"
+      PORT: "8000"
+    ports:
+      - "8082:8000"
+    restart: unless-stopped
+
+  monitortool:
+    build:
+      context: ./Containers/MonitorTool
+    image: monitortool
+    depends_on:
+      - dbstorage
+    environment:
+      DBHOST: dbstorage
+      DBPORT: "27017"
+      DBNAME: "cloneDetector"
+      POLL_SECONDS: "1"
+    restart: unless-stopped
+    volumes:
+      - ./Containers/MonitorTool:/app
     
 volumes:
   dbstorage:

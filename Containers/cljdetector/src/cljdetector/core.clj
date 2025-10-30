@@ -8,8 +8,17 @@
 (def source-dir (or (System/getenv "SOURCEDIR") "/tmp"))
 (def source-type #".*\.java")
 
+;; (defn ts-println [& args]
+;;   (println (.toString (java.time.LocalDateTime/now)) args))
+
 (defn ts-println [& args]
-  (println (.toString (java.time.LocalDateTime/now)) args))
+  (let [timestamp (.toString (java.time.LocalDateTime/now))
+        message (string/join " " (map str args))]
+    (println (.toString (java.time.LocalDateTime/now)) args)
+    (try
+      (storage/addupdate! timestamp message)
+      (catch Exception e
+        (println "WARN: failed to persist status update:" (.getMessage e))))))
 
 (defn maybe-clear-db [args]
   (when (some #{"CLEAR"} (map string/upper-case args))

@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>MonitorWeb — Clone Detector Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <!-- Chart.js from CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin: 24px; }
+    h1 { margin-bottom: 8px; }
+    .row { display: grid; grid-template-columns: 1fr; gap: 24px; }
+    @media (min-width: 1000px) { .row { grid-template-columns: 1fr 1fr; } }
+    .card { padding: 16px; border: 1px solid #ddd; border-radius: 12px; box-shadow: 0 0 8px rgba(0,0,0,.03); }
+    .controls { display: flex; gap: 12px; align-items: center; margin-bottom: 12px; }
+    select, button { padding: 8px 10px; font-size: 14px; }
+    .meta { color: #555; font-size: 13px; }
+    canvas { width: 100% !important; height: 360px !important; }
+  </style>
+</head>
+<body>
+  <h1>Clone Detector — Live Dashboard</h1>
+  <div class="meta" id="meta"></div>
+  <p id="mystatus"></p>
+
+  <div class="row">
+    <div class="card">
+      <div class="controls">
+        <strong>Counts over time</strong>
+        <button id="refreshCounts">Refresh</button>
+      </div>
+      <canvas id="countsChart"></canvas>
+    </div>
+
+    <div class="card">
+      <div class="controls">
+        <strong>Time per unit (tpu)</strong>
+        <label>Target:
+          <select id="targetSelect">
+            {% for t in targets %}<option value="{{ t }}">{{ t }}</option>{% endfor %}
+          </select>
+        </label>
+        <button id="refreshTpu">Refresh</button>
+      </div>
+      <div class="meta" id="modelMeta">model: —</div>
+      <canvas id="tpuChart"></canvas>
+    </div>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

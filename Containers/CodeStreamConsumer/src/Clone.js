@@ -28,7 +28,7 @@ class Clone {
         if (this.isNext(clone)) {
             this.sourceChunk = [...new Set([...this.sourceChunk, ...clone.sourceChunk])];
             this.sourceEnd = this.sourceChunk[this.sourceChunk.length-1].lineNumber;
-            //console.log('Expanded clone, now starting at', this.sourceStart, 'and ending at', this.sourceEnd);
+            console.log('Expanded clone, now starting at', this.sourceStart, 'and ending at', this.sourceEnd);
             return true;
         } else {
             return false;

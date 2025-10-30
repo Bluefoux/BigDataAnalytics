@@ -52,7 +52,7 @@ class CloneDetector {
     }
 
     #getContentLines(file) {
-        return file.lines.filter( line => line.hasContent() );        
+        return file.lines.filter( line => line.hasContent() );
     }
 
 
@@ -80,6 +80,25 @@ class CloneDetector {
     }
 
     #filterCloneCandidates(file, compareFile) {
+
+        if (!compareFile || file.name == compareFile.name) {
+            return file;
+        }
+
+        const fileChunks = file.chunks || [];
+        const compareChunks = compareFile.chunks || [];
+
+        const newInstances = fileChunks.flatMap((myfileChunk) =>
+            compareChunks
+                .filter((cmpfileChunk) => this.#chunkMatch(myfileChunk, cmpfileChunk))
+                .map((cmpfileChunk) => new Clone(file.name, compareFile.name, myfileChunk, cmpfileChunk))
+        );
+
+        if (newInstances.length > 0) {
+            file.instances.push(...newInstances);
+            console.log(`Found ${newInstances.length} new clones between ${file.name} and ${compareFile.name}`);
+        }
+
         // TODO
         // For each chunk in file.chunks, find all #chunkMatch() in compareFile.chunks
         // For each matching chunk, create a new Clone.
@@ -96,8 +115,40 @@ class CloneDetector {
         file.instances = file.instances.concat(newInstances);
         return file;
     }
-     
+    
     #expandCloneCandidates(file) {
+        const instances = (file.instances || []).slice();
+
+        // Sort to get deterministic, forward traversal by source start
+        instances.sort((a, b) => a.sourceStart - b.sourceStart);
+
+        // Group by target file name so we only expand sequences that belong to the same target
+        const groups = instances.reduce((accumulator, clone) => {
+            const key = clone.targets && clone.targets[0] ? clone.targets[0].name : '__unknown__';
+            (accumulator[key] ||= []).push(clone);
+            return accumulator;
+        }, {});
+
+        // for each target group, expand using a reduce accumulator
+        const expanded = Object.values(groups).flatMap(group => {
+            return group.reduce((accumulator, curr) => {
+                let merged = false;
+
+                // try to expand into any existing accumulated clone
+                for (const ex of accumulator) {
+                    if (ex.maybeExpandWith(curr)) {
+                        merged = true;
+                        break; // already merged
+                    }
+                }
+
+                // if it no merge, keep it as root
+                if (!merged) accumulator.push(curr);
+                return accumulator;
+            }, []);
+        });
+
+        file.instances = expanded;
         // TODO
         // For each Clone in file.instances, try to expand it with every other Clone
         // (using Clone::maybeExpandWith(), which returns true if it could expand)
@@ -116,6 +167,22 @@ class CloneDetector {
     }
     
     #consolidateClones(file) {
+        const instances = file.instances || [];
+
+        const unique = instances.reduce((acc, curr) => {
+            // Find if an equivalent clone already exists in the accumulator
+            const existing = acc.find(c => c.equals(curr));
+            if (existing) {
+                // Merge targets from the duplicate into the existing one
+                existing.addTarget(curr);
+            } else {
+                acc.push(curr);
+            }
+            return acc;
+        }, []);
+
+        file.instances = unique;
+
         // TODO
         // For each clone, accumulate it into an array if it is new
         // If it isn't new, update the existing clone to include this one too
