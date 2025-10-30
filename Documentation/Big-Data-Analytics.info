@@ -1219,9 +1219,10 @@ mount from different containers.
   5. Create a volume for the Qualitas Corpus: ‘docker volume create
      qc-volume’
 
-  6. Run the ‘corpusgetter’ image with the ‘qc-volume’ mounted and
-     instruct it to fetch the corpus: ‘docker run -it -v
-     qc-volume:/QualitasCorpus --name qc-getter corpusgetter FETCH’
+  6. Run the ‘corpusgetter’ image and instruct it to fetch the corpus:
+     ‘docker run -it -v qc-volume:/QualitasCorpus -v
+     ./Containers/CorpusGetter:/Download --name qc-getter corpusgetter
+     ./qc-get.sh INSTALL’
 
   7. If all goes well, this should end by printing some statistics about
      the fetched corpus and then pause.  If not, you can re-run the
@@ -2852,32 +2853,32 @@ Node: Learning Outcomes52743
 Node: Quiz Introduction to Big Data53760
 Node: Big Data Analytics in Practice Problem Overview56161
 Node: Task Downloading and Describing the Qualitas Corpus61368
-Node: Quiz Code Clones and Big Data63850
-Node: Assignment Task Working with a Stream of Data65874
-Node: Assignment Submission Code Stream Clone Detector72444
-Ref: assignmentCodeStream72751
-Node: Improving the Clone Detecting Algorithm74093
-Node: Hashing75769
-Node: O(n^2)77683
-Node: From File-by-File to All-at-Once Analysis80324
-Node: Wisely and slow They stumble that run fast87058
-Node: cljDetector All-at-Once Clone Detection91171
-Node: First Run on full Qualitas Corpus96761
-Node: Expanding Elegantly but Inefficiently99995
-Ref: elegant-expansion100300
-Node: Expand with ``Aleph-null Bottles of Beer''104170
-Ref: beer-expansion104480
-Node: Expand with Aggregation Pipeline109035
-Ref: db-expansion109326
-Node: Second Run on full Qualitas Corpus113001
-Node: Assignment Task Implementing Monitoring115214
-Node: Assignment Submission All at Once Clone Detector120358
-Ref: assignmentAllAtOnce120629
-Node: Summary123796
-Node: Concept Index133525
-Node: Program Index142725
-Node: Files and Data Types Index145649
-Node: Functions and Commands Index146349
+Node: Quiz Code Clones and Big Data63875
+Node: Assignment Task Working with a Stream of Data65899
+Node: Assignment Submission Code Stream Clone Detector72469
+Ref: assignmentCodeStream72776
+Node: Improving the Clone Detecting Algorithm74118
+Node: Hashing75794
+Node: O(n^2)77708
+Node: From File-by-File to All-at-Once Analysis80349
+Node: Wisely and slow They stumble that run fast87083
+Node: cljDetector All-at-Once Clone Detection91196
+Node: First Run on full Qualitas Corpus96786
+Node: Expanding Elegantly but Inefficiently100020
+Ref: elegant-expansion100325
+Node: Expand with ``Aleph-null Bottles of Beer''104195
+Ref: beer-expansion104505
+Node: Expand with Aggregation Pipeline109060
+Ref: db-expansion109351
+Node: Second Run on full Qualitas Corpus113026
+Node: Assignment Task Implementing Monitoring115239
+Node: Assignment Submission All at Once Clone Detector120383
+Ref: assignmentAllAtOnce120654
+Node: Summary123821
+Node: Concept Index133550
+Node: Program Index142750
+Node: Files and Data Types Index145674
+Node: Functions and Commands Index146374
 
 End Tag Table
 

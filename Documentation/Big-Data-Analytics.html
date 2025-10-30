@@ -769,7 +769,7 @@ Next: <a href="#Quiz-Code-Clones-and-Big-Data" accesskey="n" rel="next">Quiz: Co
 
 </li><li> Create a volume for the Qualitas Corpus: <code class="code">docker volume create qc-volume</code>
 
-</li><li> Run the <code class="code">corpusgetter</code> image with the <code class="code">qc-volume</code> mounted and instruct it to fetch the corpus: <code class="code">docker run -it -v qc-volume:/QualitasCorpus --name qc-getter corpusgetter FETCH</code>
+</li><li> Run the <code class="code">corpusgetter</code> image and instruct it to fetch the corpus: <code class="code">docker run -it -v qc-volume:/QualitasCorpus -v ./Containers/CorpusGetter:/Download --name qc-getter corpusgetter ./qc-get.sh INSTALL</code>
 
 </li><li> If all goes well, this should end by printing some statistics about the fetched corpus and then pause. If not, you can re-run the <code class="code">corpusgetter</code> image without any commands, which will only print these statistics and then pause: <code class="code">docker run -it -v qc-volume:/QualitasCorpus --name qc-getter corpusgetter</code>  . Note that pressing any key will terminate the script and end the container, please do not do this yet.
 

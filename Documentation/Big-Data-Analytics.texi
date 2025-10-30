@@ -722,7 +722,7 @@ Build the @samp{CorpusGetter} image (found in @code{Containers/CorpusGetter} ) a
 Create a volume for the Qualitas Corpus: @code{docker volume create qc-volume}
 
 @item
-Run the @code{corpusgetter} image with the @code{qc-volume} mounted and instruct it to fetch the corpus: @code{docker run -it -v qc-volume:/QualitasCorpus --name qc-getter corpusgetter FETCH}
+Run the @code{corpusgetter} image and instruct it to fetch the corpus: @code{docker run -it -v qc-volume:/QualitasCorpus -v ./Containers/CorpusGetter:/Download --name qc-getter corpusgetter ./qc-get.sh INSTALL}
 
 @item
 If all goes well, this should end by printing some statistics about the fetched corpus and then pause. If not, you can re-run the @code{corpusgetter} image without any commands, which will only print these statistics and then pause: @code{docker run -it -v qc-volume:/QualitasCorpus --name qc-getter corpusgetter}  . Note that pressing any key will terminate the script and end the container, please do not do this yet.

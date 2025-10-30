@@ -6,7 +6,7 @@ corpusVolume:
 	@docker volume create qc-volume
 
 corpusGet: corpusVolume
-	@docker run -it -v qc-volume:/QualitasCorpus --name qc-getter corpusgetter ./qc-get.sh FETCH
+	@docker run -it -v qc-volume:/QualitasCorpus -v ./Containers/CorpusGetter:/Download --name qc-getter corpusgetter ./qc-get.sh INSTALL
 
 corpusCheck: corpusVolume
 	@docker run -it -v qc-volume:/QualitasCorpus --name qc-getter corpusgetter
